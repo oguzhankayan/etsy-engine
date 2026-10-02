@@ -1,0 +1,7 @@
+# Portable pre-commit config (run once: `.venv/bin/pre-commit install`).
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.20
+    hooks:
+      - id: ruff-check
+        args: [--fix]

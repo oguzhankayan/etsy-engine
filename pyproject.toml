@@ -1,0 +1,43 @@
+[project]
+name = "etsy-engine"
+version = "0.1.0"
+readme = "README.md"
+license = {text = "MIT"}
+description = "Trend-driven Etsy digital product engine: find demand, design printables, make mockups, write SEO, publish drafts. Images by Raywake."
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=0.40",
+    "praw>=7.7",
+    "pytrends>=4.9",
+    "requests>=2.31",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "python-dotenv>=1.0",
+    "click>=8.1",
+    "rich>=13.7",
+    "pillow>=10.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.15", "pre-commit>=3.7"]
+
+[project.scripts]
+etsy-engine = "etsy_engine.__main__:cli"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["scripts", "output", "data"]
+
+[tool.ruff.lint]
+# F = pyflakes (dead code, undefined names — the real defects); UP = safe modernization;
+# E (minus E501 line-length, which is style not a bug and would churn 49 existing lines).
+select = ["E", "F", "UP"]
+ignore = ["E501"]

@@ -1,0 +1,63 @@
+{
+  "_meta": {"version": 2},
+  "questionnaire": {
+    "triggers": ["all about", "questionnaire", "survey", "interview", "fill in"],
+    "seeds": ["printable questionnaire", "all about my questionnaire", "fill in printable"],
+    "formats": ["single page PDF", "pre-designed hand-filled questions"],
+    "example_themes": ["dad", "mom", "grandpa", "teacher", "graduate", "birthday kid"]
+  },
+  "coupon_book": {
+    "triggers": ["coupon", "voucher", "redeemable", "gift certificate"],
+    "seeds": ["coupon book printable", "printable gift coupons", "voucher book"],
+    "formats": ["6-12 page booklet", "pre-designed tear-off coupons"],
+    "example_themes": ["dad", "mom", "valentine", "birthday", "christmas"]
+  },
+  "party_games": {
+    "triggers": ["game", "trivia", "activity", "bingo", "scavenger hunt", "puzzle"],
+    "seeds": ["printable party games", "trivia game printable", "party activity pack"],
+    "formats": ["multi-page game pack", "single sheet game"],
+    "example_themes": ["baby shower", "birthday", "bachelorette", "halloween", "christmas"]
+  },
+  "greeting_card": {
+    "triggers": ["card", "greeting", "funny card", "pun"],
+    "seeds": ["funny printable card", "printable greeting card", "handmade card printable"],
+    "formats": ["folded card PDF", "single sheet print-and-fold"],
+    "example_themes": ["dad", "mom", "valentine", "birthday", "graduation"]
+  },
+  "coloring_page": {
+    "triggers": ["coloring", "color in", "colour", "bold and easy", "bold easy", "kawaii", "cozy coloring", "malbuch", "ausmalbild"],
+    "seeds": ["bold easy coloring book", "cute cozy coloring pages", "kawaii coloring book", "coloring book bundle pdf", "adult coloring printable", "kids coloring pages bundle", "animal coloring book", "mandala coloring pages", "dinosaur coloring book", "mermaid coloring pages"],
+    "formats": ["20-50 page coloring book", "bold thick-line easy designs", "themed line-art collection"],
+    "example_themes": ["cozy cute", "animals", "dinosaurs", "mermaid", "fairy", "mandala", "stress relief", "summer", "christmas", "halloween", "farm animals", "ocean", "woodland"]
+  },
+  "wall_art_poster": {
+    "triggers": ["wall art", "poster", "print", "decor", "minimalist", "line art"],
+    "seeds": ["minimalist wall art", "line art poster", "digital print decor"],
+    "formats": ["single high-res print", "native-ratio PDF and PNG"],
+    "example_themes": ["nursery", "motivation", "kitchen", "office", "travel", "sports"]
+  },
+  "banner_decor": {
+    "triggers": ["banner", "bunting", "pennant", "garland", "flag"],
+    "seeds": ["printable banner", "pennant flags printable", "party garland"],
+    "formats": ["multi-flag PDF", "letter-size print-and-cut"],
+    "example_themes": ["birthday", "baby shower", "graduation", "holiday"]
+  },
+  "planner_kit": {
+    "triggers": ["planner", "kit", "bundle", "system", "organizer"],
+    "seeds": ["printable planner kit", "organizer bundle", "planning system"],
+    "formats": ["6-10 page bundle", "planner plus tracker and checklist"],
+    "example_themes": ["budget", "meal", "garden", "wedding", "fitness", "travel"]
+  },
+  "checklist_tracker": {
+    "triggers": ["checklist", "tracker", "log", "chart", "schedule"],
+    "seeds": ["printable checklist", "tracker printable", "daily log"],
+    "formats": ["single page", "multi-page log book"],
+    "example_themes": ["cleaning", "chore", "habit", "packing", "reading", "collection"]
+  },
+  "sticker_sheet": {
+    "triggers": ["sticker", "label", "tag"],
+    "seeds": ["printable stickers", "sticker sheet printable", "gift tags printable"],
+    "formats": ["letter-size sticker sheet", "pre-designed cut-out labels"],
+    "example_themes": ["planner", "party", "holiday", "kids"]
+  }
+}

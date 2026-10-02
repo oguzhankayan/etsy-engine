@@ -1,4 +1,19 @@
-# etsy-engine
+<p align="center">
+  <a href="https://raywake.com/?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=readme-logo">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/raywake-logo-dark.svg">
+      <img src="docs/assets/raywake-logo-light.svg" alt="Raywake" width="200">
+    </picture>
+  </a>
+</p>
+
+<h1 align="center">etsy-engine</h1>
+
+<p align="center">
+  <a href="https://raywake.com/?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=badge"><img alt="Images by Raywake" src="https://img.shields.io/badge/images%20by-Raywake-c3092d"></a>
+  <a href="LICENSE"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-222221"></a>
+  <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-222221">
+</p>
 
 **An open-source engine that finds what Etsy buyers are already paying for, designs an
 original printable product for it, shoots the listing photos, writes the SEO, and
@@ -16,10 +31,10 @@ etsy-engine demo "teacher appreciation week"
 # -> output/1/  4 print-ready pages, listing photos, listing.md (title, 13 tags, description)
 ```
 
-> **Disclosure:** etsy-engine is built and maintained by the team behind
-> [Raywake](https://raywake.com), and Raywake is the image backend. You need a Raywake
-> API key and an Anthropic API key, nothing else, to make your first product. The
-> code is MIT: fork it and wire in whatever you like.
+> **Built by the team behind [Raywake](https://raywake.com/?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=disclosure).** Raywake is the image
+> engine behind every page and listing photo here. All you need for your first product
+> is a [Raywake API key](https://raywake.com/api-keys?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=disclosure) and an Anthropic key. The code is MIT, so
+> fork it and change anything you like.
 
 ---
 
@@ -68,8 +83,21 @@ The demo caps the bundle at 4 pages (`--max-pages 0` for the full plan) and prin
 output folder. Every image is quoted before it starts. `etsy-engine credits` shows
 your balance and what you've spent.
 
-Get keys: **Raywake** → [raywake.com](https://raywake.com) (studio → API keys, scopes
+Get keys: **Raywake** → [create an API key](https://raywake.com/api-keys?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=quickstart) (scopes
 `generate` + `jobs:read`) · **Anthropic** → [console.anthropic.com](https://console.anthropic.com).
+
+## What a product costs
+
+Each image is priced by a Raywake quote before it runs, and `etsy-engine demo` prints
+the total when it finishes. A typical demo product is 4 pages plus 2 mockups (the
+contents grid is free, built pixel-exact from your pages). That makes 6 images, or 7
+if the hero thumbnail tests weak and gets one re-roll, plus a few cents of Claude
+calls for planning, QC and SEO.
+
+<!-- TODO: replace with a measured run: "teacher appreciation week" demo = N credits ≈ $X; sells for $Y on Etsy -->
+
+Your balance and running spend are one command away: `etsy-engine credits`.
+[Credit packs →](https://raywake.com/pricing?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=readme-cost)
 
 ## Going live on Etsy
 
@@ -107,7 +135,18 @@ Drafts only, by design. Open each draft, tick Etsy's **"With an AI generator"** 
 Full reference: [docs/PIPELINE.md](docs/PIPELINE.md). Operating rules and the reasoning
 behind them: [RULES.md](RULES.md). SEO playbook: [docs/etsy-seo.md](docs/etsy-seo.md).
 
-## Images
+## Images: why Raywake
+
+We built Raywake because this engine needed it: one API key and one credit balance
+for image, video and audio models, with every job priced before it starts and safe
+to retry. In etsy-engine that means:
+
+- **No surprise bills.** Every image is quoted first, and a retry after a timeout
+  reuses the same idempotency key, so a network blip never pays twice.
+- **The right model for each job.** GPT Image 2.5 Sunburst renders printable text
+  cleanly, and its edit mode reproduces your real pages inside mockup scenes.
+- **One balance for the studio and the API.** Try a prompt in the
+  [Raywake studio](https://raywake.com/?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=readme-studio), then run it here.
 
 All image generation goes through one file,
 [`src/etsy_engine/generate/raywake.py`](src/etsy_engine/generate/raywake.py), in three

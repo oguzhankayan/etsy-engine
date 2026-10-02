@@ -154,3 +154,17 @@ def test_fit_references_shares_the_body_budget(tmp_path):
     fitted = hosting.fit_references(refs)
     assert fitted[-1] == "https://x/remote.jpg"
     assert sum(len(r) for r in fitted if r.startswith("data:")) <= hosting.BODY_BUDGET
+
+
+def test_missing_key_points_to_raywake_with_utm(monkeypatch):
+    monkeypatch.setattr(raywake.settings, "raywake_api_key", "")
+    with pytest.raises(raywake.MissingKeyError) as e:
+        raywake.require_key()
+    assert "raywake.com/api-keys?utm_source=github" in str(e.value)
+
+
+def test_out_of_credits_links_to_topup(client, monkeypatch):
+    calls = []
+    _wire(monkeypatch, [FakeResp(status=402, payload={})], calls)
+    with pytest.raises(RaywakeError, match="utm_content=out-of-credits"):
+        client.generate("p")

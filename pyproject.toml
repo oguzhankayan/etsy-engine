@@ -22,7 +22,7 @@ dependencies = [
 dev = ["pytest>=8.0", "ruff>=0.15", "pre-commit>=3.7"]
 
 [project.scripts]
-etsy-engine = "etsy_engine.__main__:cli"
+etsy-engine = "etsy_engine.__main__:main"
 
 [build-system]
 requires = ["setuptools>=68"]

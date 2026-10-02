@@ -158,6 +158,8 @@ def demo(term: str, max_pages: int, variations: int) -> None:
     r = pipeline.demo(term, max_pages=max_pages, variations=variations)
     console.print(f"[green]Product #{r['product_id']}:[/] {r['title']}")
     console.print(f"Files: {r['dir']}")
+    console.print(f"Images: {r['images']} made with Raywake for {r['credits']} credits "
+                  f"(balance: `etsy-engine credits`)")
     console.print("To sell it: connect Etsy (docs/SETUP.md) and run "
                   f"`etsy-engine publish --product-id {r['product_id']}`")
 
@@ -165,12 +167,14 @@ def demo(term: str, max_pages: int, variations: int) -> None:
 @cli.command()
 def credits() -> None:
     """Show the Raywake credit balance + local image spend ledger."""
-    from .generate.raywake import RaywakeClient, total_spend
+    from .generate.raywake import RaywakeClient, link, require_key, total_spend
 
+    require_key()
     console.print("Raywake wallet:", RaywakeClient().credits())
     ws = total_spend()
     console.print(f"Spent locally: {ws['credits']} credits over {ws['images']} image(s) "
                   f"(ledger: data/raywake_spend.jsonl)")
+    console.print(f"Top up / usage: {link('pricing', 'credits-cmd')}", soft_wrap=True)
 
 
 @cli.group()
@@ -704,5 +708,15 @@ def pin_spread(limit: int) -> None:
     pinterest.publish_due(limit=limit)
 
 
+def main() -> None:
+    """CLI entry point: a missing Raywake key prints directions instead of a traceback."""
+    from .generate.raywake import MissingKeyError
+    try:
+        cli()
+    except MissingKeyError as e:
+        console.print(f"[yellow]{e}[/]", soft_wrap=True)
+        raise SystemExit(1) from None
+
+
 if __name__ == "__main__":
-    cli()
+    main()

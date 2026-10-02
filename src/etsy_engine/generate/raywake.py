@@ -34,12 +34,36 @@ from ..config import DATA_DIR, settings
 
 SPEND_LOG = DATA_DIR / "raywake_spend.jsonl"  # append-only per-image credit ledger
 
+
+def link(path: str = "", content: str = "cli") -> str:
+    """A raywake.com link tagged so Raywake can tell which etsy-engine touchpoint sent you."""
+    return (f"https://raywake.com/{path.lstrip('/')}?utm_source=github"
+            f"&utm_medium=etsy-engine&utm_campaign=oss&utm_content={content}")
+
+
+KEYS_URL = link("api-keys", "missing-key")
+TOPUP_URL = link("pricing", "out-of-credits")
+
+
+class MissingKeyError(RuntimeError):
+    pass
+
+
+def require_key() -> None:
+    """Fail early, with directions, when no Raywake key is configured."""
+    if not settings.raywake_api_key:
+        raise MissingKeyError(
+            "RAYWAKE_API_KEY is not set — every image in etsy-engine is made with Raywake.\n"
+            f"  1. Create a key (scopes: generate, jobs:read): {KEYS_URL}\n"
+            "  2. Add it to .env:  RAYWAKE_API_KEY=...\n"
+            "  3. Check it:        etsy-engine credits")
+
 # Portrait ~US Letter ratio (8.5x11) at print resolution — the default printable size.
 DEFAULT_SIZE = "1536x2048"
 
 ERRORS = {
     400: "Bad request (invalid input for this model)", 401: "Unauthorized (bad/revoked API key)",
-    402: "Insufficient credits — top up at https://raywake.com/pricing",
+    402: f"Out of Raywake credits — top up here: {TOPUP_URL}",
     403: "Forbidden (API key is missing a scope: needs generate + jobs:read)",
     404: "Not found", 409: "Conflict (quote expired/changed input or idempotency clash)",
     413: "Request too large", 429: "Rate limited",
@@ -92,7 +116,7 @@ class RaywakeClient:
     # --- http ---------------------------------------------------------------
     def _headers(self, idempotency_key: str | None = None) -> dict:
         if not self.api_key:
-            settings.require("raywake_api_key")
+            require_key()
         h = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json",
              "User-Agent": "etsy-engine (+https://raywake.com)"}
         if idempotency_key:

@@ -27,5 +27,6 @@ def test_demo_caps_pages_and_writes_listing(monkeypatch, tmp_path):
 
     r = pipeline.demo("teacher week", max_pages=4)
     assert seen["pages"] == 4
+    assert r["images"] == 0 and r["credits"] == 0
     md = (tmp_path / str(r["product_id"]) / "listing.md").read_text()
     assert "Teacher Kit" in md and "teacher, printable" in md

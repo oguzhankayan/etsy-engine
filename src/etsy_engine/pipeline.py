@@ -336,8 +336,12 @@ def demo(term: str, max_pages: int = 4, variations: int = 1) -> dict:
     from .config import OUTPUT_DIR
     from .models import Tier, Trend
 
-    settings.require("anthropic_api_key", "raywake_api_key")
+    from .generate.raywake import require_key, total_spend
+
+    require_key()
+    settings.require("anthropic_api_key")
     db.init_db()
+    spent_before = total_spend()
     trend_id = db.upsert_trend(Trend(source="demo", term=term, tier=Tier.EVERGREEN))
     product, items, intel = build_product(trend_id, term, "demo run")
     if max_pages and len(items) > max_pages:
@@ -363,8 +367,11 @@ def demo(term: str, max_pages: int = 4, variations: int = 1) -> dict:
     (out / "listing.md").write_text(
         f"# {listing.title}\n\n**Tags:** {', '.join(tags)}\n\n{listing.description}\n",
         encoding="utf-8")
+    spent = total_spend()
     print(f"[demo] done -> {out}  (pages, mockups/, listing.md)")
-    return {"product_id": pid, "dir": str(out), "title": listing.title, "tags": tags}
+    return {"product_id": pid, "dir": str(out), "title": listing.title, "tags": tags,
+            "images": spent["images"] - spent_before["images"],
+            "credits": round(spent["credits"] - spent_before["credits"], 2)}
 
 
 def finalize_product(pid: int, variations: int = 1) -> int | None:

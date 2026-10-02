@@ -72,7 +72,7 @@ etsy-engine demo "teacher appreciation week"
 ## Quickstart
 
 ```bash
-git clone https://github.com/<you>/etsy-engine && cd etsy-engine
+git clone https://github.com/oguzhankayan/etsy-engine && cd etsy-engine
 python3 -m venv .venv && .venv/bin/pip install -e .
 cp .env.example .env            # add RAYWAKE_API_KEY + ANTHROPIC_API_KEY
 .venv/bin/etsy-engine credits   # confirms the Raywake key works

@@ -30,11 +30,11 @@ def run(**kwargs):
 
 
 def test_login_shows_the_code_waits_for_approval_and_saves_an_owner_only_key(monkeypatch):
-    calls = fake_server(monkeypatch, [(400, {"error": "authorization_pending"}), (400, {"error": "slow_down"}),
+    calls = fake_server(monkeypatch, [(400, {"error": "authorization_pending"}), (502, {}), (400, {"error": "slow_down"}),
                                       (200, {"access_token": "aip_live_secret", "token_type": "Bearer"})])
     path, lines, waits = run()
     assert lines[0] == "Your code: WDJB-MJHT" and "connect?code=WDJB-MJHT" in lines[1]
-    assert waits == [5, 5, 10]  # slow_down adds five seconds
+    assert waits == [5, 5, 5, 10]  # a passing 502 is waited out; slow_down adds five seconds
     assert calls[0] == ("/v1/oauth/device", {"client_id": "etsy-engine"})
     assert calls[1][1] == {"grant_type": connect.DEVICE_GRANT, "device_code": "dev-secret", "client_id": "etsy-engine"}
     assert connect.stored_key() == "aip_live_secret" and path == connect.CREDENTIALS

@@ -94,15 +94,18 @@ def login(base: str, *, say: Callable[[str], None] = print, open_browser: bool =
     deadline = clock() + int(start.get("expires_in") or 600)
     while clock() < deadline:
         sleep(interval)
-        status, token = _post(base, "/v1/oauth/token", {"grant_type": DEVICE_GRANT, "device_code": start["device_code"],
-                                                        "client_id": CLIENT_ID})
+        try:
+            status, token = _post(base, "/v1/oauth/token", {"grant_type": DEVICE_GRANT,
+                                                            "device_code": start["device_code"], "client_id": CLIENT_ID})
+        except ConnectError:
+            continue  # offline for a moment; the code stays valid until it expires
         if status == 200 and token.get("access_token"):
             saved = save_key(token["access_token"], path)
             say(f"Connected. Your key is saved in {saved} (only you can read it).")
             return saved
         error = token.get("error")
-        if error == "authorization_pending":
-            continue
+        if error == "authorization_pending" or status >= 500 or status == 429:
+            continue  # a passing server or network error: keep waiting until the code expires
         if error == "slow_down":
             interval += 5
             continue

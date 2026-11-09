@@ -29,6 +29,7 @@ import time
 import uuid
 
 import requests
+from pathlib import Path
 
 from ..config import DATA_DIR, settings
 
@@ -188,6 +189,22 @@ class RaywakeClient:
     def quote(self, model: str, inp: dict) -> dict:
         """A free price check: {"quote_id", "credits", ...}; credits are cents."""
         return self._request("POST", "/v1/quotes", body={"model": model, "input": inp})
+
+    def upload(self, path, content_type: str = "image/jpeg") -> str:
+        """Upload a local file to your Raywake account and return a URL any model can read.
+
+        Some providers only fetch inputs by URL (no data URIs); uploads are kept for a few days.
+        """
+        data = Path(path).read_bytes()
+        reserved = self._request("POST", "/v1/media-assets", body={"content_type": content_type, "size_bytes": len(data)})
+        try:
+            put = requests.put(reserved["upload_url"], data=data, timeout=120,
+                               headers={"Content-Type": content_type, "Content-Length": str(len(data))})
+        except requests.RequestException as e:
+            raise RaywakeError(f"upload failed: {str(e)[:160]}") from e
+        if put.status_code >= 300:
+            raise RaywakeError(f"upload failed: HTTP {put.status_code}")
+        return self._request("POST", f"/v1/media-assets/{reserved['id']}/complete")["url"]
 
     def run(self, model: str, inp: dict, timeout: int = 300) -> bytes:
         """Quote, generate and download one output of any catalog model (same safety as generate)."""

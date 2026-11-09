@@ -11,15 +11,12 @@ is already print-sized is never upscaled again.
 """
 from __future__ import annotations
 
-import base64
-import io
 from decimal import Decimal
 from pathlib import Path
 
 MODEL = "bria/increase-resolution"
 # A4 at 300 DPI is 2480 px wide and US Letter 2550; anything shorter prints soft at full page.
 PRINT_SHORT_EDGE = 2400
-BODY_BUDGET = 950_000  # Raywake caps a request body at about 1 MB
 
 
 def _short_edge(path: Path) -> int:
@@ -46,47 +43,30 @@ def pages_needing_upscale(product_id: int) -> list[Path]:
     return pages
 
 
-def full_reference(path: Path, budget: int = BODY_BUDGET) -> str:
-    """The page as a data URI at full size: quality drops before pixels do, so the upscale sees every detail."""
-    from PIL import Image
-    im = Image.open(path)
-    if im.mode not in ("RGB", "L"):
-        im = im.convert("RGB")
-    scale, quality = 1.0, 92
-    while True:
-        frame = im if scale == 1.0 else im.resize((int(im.width * scale), int(im.height * scale)), Image.LANCZOS)
-        buf = io.BytesIO()
-        frame.save(buf, format="JPEG", quality=quality, optimize=True)
-        uri = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
-        if len(uri) <= budget:
-            return uri
-        if quality > 70:
-            quality -= 6
-        else:
-            scale *= 0.9
+def _input(client, path: Path, uploaded: dict) -> dict:
+    """The page uploaded once at full size; the upscaler only reads inputs by URL."""
+    if path not in uploaded:
+        uploaded[path] = client.upload(path)
+    return {"image_url": uploaded[path], "desired_increase": 2, "output_type": "jpeg"}
 
 
-def _input(path: Path) -> dict:
-    return {"image_url": full_reference(path), "desired_increase": 2, "output_type": "jpeg"}
-
-
-def estimate_usd(client, pages: list[Path]) -> Decimal:
+def estimate_usd(client, pages: list[Path], uploaded: dict | None = None) -> Decimal:
     """The quoted total: one quote for the first page times the page count (the price is per image)."""
     if not pages:
         return Decimal(0)
-    quote = client.quote(MODEL, _input(pages[0]))
+    quote = client.quote(MODEL, _input(client, pages[0], {} if uploaded is None else uploaded))
     return Decimal(int(quote["credits"])) / 100 * len(pages)
 
 
-def upscale(client, pages: list[Path], say=print) -> int:
+def upscale(client, pages: list[Path], say=print, uploaded: dict | None = None) -> int:
     """Upscale each page in place, keeping the original as <name>.orig.jpg. Returns pages upscaled."""
     from .generator import _to_jpeg
-    done = 0
+    done, uploaded = 0, {} if uploaded is None else uploaded
     for index, path in enumerate(pages, start=1):
         if _short_edge(path) >= PRINT_SHORT_EDGE:
             continue  # done on an earlier run
         say(f"  upscaling page {index}/{len(pages)}: {path.name}")
-        data = _to_jpeg(client.run(MODEL, _input(path)), quality=92)
+        data = _to_jpeg(client.run(MODEL, _input(client, path, uploaded)), quality=92)
         original = path.with_name(path.stem + ".orig.jpg")
         if not original.exists():
             original.write_bytes(path.read_bytes())

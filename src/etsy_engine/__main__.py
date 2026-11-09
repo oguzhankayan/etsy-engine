@@ -416,16 +416,16 @@ def offer_print_upscale(product_id: int, upscale: bool | None) -> int:
     if not pages or upscale is False:
         return 0
     require_key()
-    client = RaywakeClient()
+    client, uploaded = RaywakeClient(), {}  # each page is uploaded once, for the quote and the run
     if upscale is None:
         if not sys.stdin.isatty():
             return 0  # unattended runs never spend without --upscale
-        cost = print_upscale.estimate_usd(client, pages)
+        cost = print_upscale.estimate_usd(client, pages, uploaded)
         console.print(f"{len(pages)} page(s) print sharp only up to about 5x7 in. Upscaling them 2x makes "
                       "them sharp on A4 and US Letter at 300 DPI; the text is not redrawn.")
         if not click.confirm(f"Upscale {len(pages)} page(s) for about ${cost:.2f} with Raywake?", default=False):
             return 0
-    done = print_upscale.upscale(client, pages, say=console.print)
+    done = print_upscale.upscale(client, pages, say=console.print, uploaded=uploaded)
     console.print(f"[green]Upscaled {done} page(s) to print size.[/] Originals kept as *.orig.jpg.")
     return done
 

@@ -1,7 +1,7 @@
 """Optional print upscale: priced and asked before publishing, never redone, originals kept."""
-import base64
 import io
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 from PIL import Image
@@ -19,7 +19,12 @@ def page(path, size=(1536, 2048), noise=False):
 
 class Client:
     def __init__(self):
-        self.runs, self.quotes = [], []
+        self.runs, self.quotes, self.uploads = [], [], {}
+
+    def upload(self, path):
+        url = f"https://files.example/{len(self.uploads)}"
+        self.uploads[url] = Path(path).read_bytes()
+        return url
 
     def quote(self, model, inp):
         self.quotes.append((model, inp))
@@ -27,7 +32,7 @@ class Client:
 
     def run(self, model, inp, timeout=300):
         self.runs.append((model, inp))
-        source = Image.open(io.BytesIO(base64.b64decode(inp["image_url"].split(",", 1)[1])))
+        source = Image.open(io.BytesIO(self.uploads[inp["image_url"]]))
         buf = io.BytesIO()
         source.resize((source.width * 2, source.height * 2)).save(buf, "JPEG")
         return buf.getvalue()
@@ -48,13 +53,13 @@ def test_only_small_jpeg_pages_are_offered(product):
     assert print_upscale.pages_needing_upscale(1) == product
 
 
-def test_pages_are_sent_at_full_size_within_the_request_budget(tmp_path):
-    plain = page(tmp_path / "plain.jpg")
-    uri = print_upscale.full_reference(plain)
-    assert Image.open(io.BytesIO(base64.b64decode(uri.split(",", 1)[1]))).size == (1536, 2048)
-    busy = page(tmp_path / "busy.jpg", noise=True)
-    uri = print_upscale.full_reference(busy, budget=400_000)
-    assert len(uri) <= 400_000
+def test_each_page_is_uploaded_once_at_full_size(product):
+    client = Client()
+    uploaded = {}
+    print_upscale.estimate_usd(client, product, uploaded)
+    print_upscale.upscale(client, product, say=lambda line: None, uploaded=uploaded)
+    assert len(client.uploads) == 2  # the quoted first page is not uploaded again
+    assert Image.open(io.BytesIO(next(iter(client.uploads.values())))).size == (1536, 2048)
 
 
 def test_upscale_replaces_pages_keeps_originals_and_never_repeats(product):

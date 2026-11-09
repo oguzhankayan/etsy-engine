@@ -49,14 +49,20 @@ class MissingKeyError(RuntimeError):
     pass
 
 
+def resolve_api_key() -> str:
+    """RAYWAKE_API_KEY from .env, else the key saved by `etsy-engine login`."""
+    from .connect import stored_key
+    return settings.raywake_api_key or stored_key()
+
+
 def require_key() -> None:
     """Fail early, with directions, when no Raywake key is configured."""
-    if not settings.raywake_api_key:
+    if not resolve_api_key():
         raise MissingKeyError(
-            "RAYWAKE_API_KEY is not set — every image in etsy-engine is made with Raywake.\n"
-            f"  1. Create a key (scopes: generate, jobs:read): {KEYS_URL}\n"
-            "  2. Add it to .env:  RAYWAKE_API_KEY=...\n"
-            "  3. Check it:        etsy-engine credits")
+            "Not connected to Raywake — every image in etsy-engine is made with Raywake.\n"
+            "  1. Connect your account:  etsy-engine login\n"
+            f"     (or create a key with scopes generate, jobs:read at {KEYS_URL} and set RAYWAKE_API_KEY in .env)\n"
+            "  2. Check it:              etsy-engine credits")
 
 # Portrait ~US Letter ratio (8.5x11) at print resolution — the default printable size.
 DEFAULT_SIZE = "1536x2048"
@@ -107,7 +113,7 @@ class RaywakeClient:
     def __init__(self, api_key: str | None = None, base_url: str | None = None,
                  model: str | None = None, edit_model: str | None = None,
                  quality: str | None = None):
-        self.api_key = api_key or settings.raywake_api_key
+        self.api_key = api_key or resolve_api_key()
         self.base = (base_url or settings.raywake_base_url).rstrip("/")
         self.model = model or settings.raywake_model
         self.edit_model = edit_model or settings.raywake_edit_model

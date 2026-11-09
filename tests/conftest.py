@@ -9,3 +9,10 @@ from etsy_engine.config import settings
 def _isolated_db(tmp_path, monkeypatch):
     monkeypatch.setattr(settings, "db_path", tmp_path / "engine.db")
     db.init_db()
+
+
+@pytest.fixture(autouse=True)
+def _isolated_connection(tmp_path, monkeypatch):
+    """Never read or write the developer's real ~/.config/etsy-engine/raywake.json."""
+    from etsy_engine.generate import connect
+    monkeypatch.setattr(connect, "CREDENTIALS", tmp_path / "config" / "raywake.json")

@@ -74,17 +74,23 @@ etsy-engine demo "teacher appreciation week"
 ```bash
 git clone https://github.com/oguzhankayan/etsy-engine && cd etsy-engine
 python3 -m venv .venv && .venv/bin/pip install -e .
-cp .env.example .env            # add RAYWAKE_API_KEY + ANTHROPIC_API_KEY
-.venv/bin/etsy-engine credits   # confirms the Raywake key works
+cp .env.example .env            # add ANTHROPIC_API_KEY
+.venv/bin/etsy-engine login     # connects your Raywake account in the browser
+.venv/bin/etsy-engine credits   # confirms the connection works
 .venv/bin/etsy-engine demo "camping meal planner"
 ```
+
+`etsy-engine login` shows an eight-letter code and opens raywake.si. Sign in (or create an
+account), check that the page shows the same code, and approve. No API key to copy: the key
+is saved for you, limited to generating images and reading your own jobs, and you can
+disconnect it any time from API keys on raywake.si or with `etsy-engine logout`.
 
 The demo caps the bundle at 4 pages (`--max-pages 0` for the full plan) and prints the
 output folder. Every image is quoted before it starts. `etsy-engine credits` shows
 your balance and what you've spent.
 
-Get keys: **Raywake** → [create an API key](https://raywake.com/api-keys?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=quickstart) (scopes
-`generate` + `jobs:read`) · **Anthropic** → [console.anthropic.com](https://console.anthropic.com).
+Keys: **Raywake** → `etsy-engine login` (or [create an API key](https://raywake.com/api-keys?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=quickstart)
+with scopes `generate` + `jobs:read` and set `RAYWAKE_API_KEY`) · **Anthropic** → [console.anthropic.com](https://console.anthropic.com).
 
 ## What a product costs
 

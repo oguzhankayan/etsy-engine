@@ -165,6 +165,30 @@ def demo(term: str, max_pages: int, variations: int) -> None:
 
 
 @cli.command()
+@click.option("--no-browser", is_flag=True, help="Print the address instead of opening a browser")
+def login(no_browser: bool) -> None:
+    """Connect your Raywake account (no API key to copy)."""
+    from .config import settings
+    from .generate.connect import ConnectError, login as connect
+    try:
+        connect(settings.raywake_base_url, say=lambda line: console.print(line, soft_wrap=True), open_browser=not no_browser)
+    except ConnectError as exc:
+        raise click.ClickException(str(exc)) from exc
+    if settings.raywake_api_key:
+        console.print("Note: RAYWAKE_API_KEY in .env still takes precedence; remove it to use this connection.")
+    console.print("Next: etsy-engine credits")
+
+
+@cli.command()
+def logout() -> None:
+    """Forget the saved Raywake connection (disconnect it fully from API keys on raywake.si)."""
+    from .generate.connect import forget_key
+    from .generate.raywake import link
+    console.print("Removed the saved key." if forget_key() else "No saved key.")
+    console.print(f"To revoke it everywhere: {link('api-keys', 'logout')}", soft_wrap=True)
+
+
+@cli.command()
 def credits() -> None:
     """Show the Raywake credit balance + local image spend ledger."""
     from .generate.raywake import RaywakeClient, link, require_key, total_spend

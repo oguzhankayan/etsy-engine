@@ -19,7 +19,7 @@ The lesson from earlier: do NOT ask an LLM to lay out an editable multi-field te
 1. **The image model renders the WHOLE finished design** per page (composition, type, icons)
    — where AI genuinely excels.
 2. **Canva Magic Layers** (the seller's manual step) turns each flat page into editable layers.
-3. **i2i mockups** (Raywake GPT Image 2.5 edit) drop the real designs into premium scenes.
+3. **i2i mockups** (Raywake GPT Image 2.6 edit) drop the real designs into premium scenes.
 
 ## ⛔ Agent runbook — human-in-the-loop (READ THIS FIRST)
 

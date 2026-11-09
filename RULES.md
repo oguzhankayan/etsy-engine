@@ -101,7 +101,7 @@ plays are scarce/IP-constrained on any given day — that's expected, not a bug.
 
 ## D. Quality bar
 
-- Printables: text rendered directly by the image model (GPT Image 2.5 via Raywake), 1536x2048,
+- Printables: text rendered directly by the image model (GPT Image 2.6 via Raywake), 1536x2048,
   QC ≥ 0.7 (generate-many / pick-best). Mockups: 2048x2048, 6 per product.
 - SEO: research-driven, 13 long-tail diverse tags, 160-char-hook description,
   per-image alt text, FAQ, + AI disclosure appended.

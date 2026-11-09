@@ -43,8 +43,8 @@ class Settings(BaseSettings):
     # the studio with the `generate` and `jobs:read` scopes. See generate/raywake.py.
     raywake_api_key: str = ""
     raywake_base_url: str = "https://api.raywake.com"
-    raywake_model: str = "openai/gpt-image-2.5/sunburst/text-to-image"
-    raywake_edit_model: str = "openai/gpt-image-2.5/sunburst/edit"   # reference-faithful mockups
+    raywake_model: str = "openai/gpt-image-2.6/sunburst/text-to-image"
+    raywake_edit_model: str = "openai/gpt-image-2.6/sunburst/edit"   # reference-faithful mockups
     raywake_quality: str = "high"   # low | medium | high | xhigh | max (higher = more credits)
 
     # Your storefront identity — printed in buyer-facing delivery PDFs and shop copy.

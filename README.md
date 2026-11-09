@@ -94,7 +94,10 @@ contents grid is free, built pixel-exact from your pages). That makes 6 images, 
 if the hero thumbnail tests weak and gets one re-roll, plus a few cents of Claude
 calls for planning, QC and SEO.
 
-<!-- TODO: replace with a measured run: "teacher appreciation week" demo = N credits ≈ $X; sells for $Y on Etsy -->
+At the default settings (GPT Image 2.6 Sunburst, 1536x2048, high quality) a page is
+quoted at about **$0.11**. Mockups send your pages as references, so they cost more.
+Across real runs the average was about **$0.30 per image**, so a 6–7 image product
+comes to roughly **$2** in Raywake credits.
 
 Your balance and running spend are one command away: `etsy-engine credits`.
 [Credit packs →](https://raywake.com/pricing?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=readme-cost)
@@ -143,14 +146,14 @@ to retry. In etsy-engine that means:
 
 - **No surprise bills.** Every image is quoted first, and a retry after a timeout
   reuses the same idempotency key, so a network blip never pays twice.
-- **The right model for each job.** GPT Image 2.5 Sunburst renders printable text
+- **The right model for each job.** GPT Image 2.6 Sunburst renders printable text
   cleanly, and its edit mode reproduces your real pages inside mockup scenes.
 - **One balance for the studio and the API.** Try a prompt in the
   [Raywake studio](https://raywake.com/?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=readme-studio), then run it here.
 
 All image generation goes through one file,
 [`src/etsy_engine/generate/raywake.py`](src/etsy_engine/generate/raywake.py), in three
-steps: quote → generate (idempotent) → poll. The default model is **GPT Image 2.5
+steps: quote → generate (idempotent) → poll. The default model is **GPT Image 2.6
 Sunburst**. It renders the printable text directly and uses its edit mode for
 reference-faithful mockups. To try another model from the Raywake catalog, set
 `RAYWAKE_MODEL`.

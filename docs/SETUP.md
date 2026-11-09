@@ -38,7 +38,7 @@ A network timeout is retried with the *same* idempotency key, so a retry returns
 existing job instead of paying twice. Jobs held for review are never resubmitted.
 Spend is logged to `data/raywake_spend.jsonl`.
 
-Default model: **GPT Image 2.5 Sunburst** — `.../text-to-image` for pages and
+Default model: **GPT Image 2.6 Sunburst** — `.../text-to-image` for pages and
 `.../edit` for mockups, where the real product pages go in as reference images so
 every listing photo shows exactly what the buyer downloads. Change it with
 `RAYWAKE_MODEL` / `RAYWAKE_EDIT_MODEL`; any image model in the Raywake catalog that

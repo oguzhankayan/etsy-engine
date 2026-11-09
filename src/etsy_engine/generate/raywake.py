@@ -17,7 +17,7 @@ Billing rules this client respects:
   - `needs_review` / `needs_reconciliation` / `submission_unknown` are never treated as
     success and never auto-resubmitted.
 
-Default model: GPT Image 2.5 Sunburst — `.../text-to-image` for new images and
+Default model: GPT Image 2.6 Sunburst — `.../text-to-image` for new images and
 `.../edit` when reference images are passed (faithful product mockups).
 """
 from __future__ import annotations

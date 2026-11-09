@@ -127,7 +127,7 @@ Output status: `planned`. No images or Etsy listings are created.
 .venv/bin/etsy-engine generate --variations 2
 ```
 
-Generates every `planned` product. Each item gets Raywake (GPT Image 2.5) variations and
+Generates every `planned` product. Each item gets Raywake (GPT Image 2.6) variations and
 Claude vision QC; the best image is stored. Missing items receive a self-heal
 retry. Status becomes `qc_passed` or `generated`.
 

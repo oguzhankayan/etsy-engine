@@ -395,11 +395,39 @@ def etsy_taxonomy(query: str) -> None:
 
 @cli.command()
 @click.option("--product-id", type=int, required=True, help="Product id to publish")
-def publish(product_id: int) -> None:
+@click.option("--upscale/--no-upscale", default=None,
+              help="Upscale pages to print size (A4/Letter at 300 DPI) first; asked when omitted")
+def publish(product_id: int, upscale: bool | None) -> None:
     """Stage 7 (Faz 4) — create a DRAFT Etsy listing (human publishes)."""
     from .publish.publisher import publish_product
 
+    offer_print_upscale(product_id, upscale)
     publish_product(product_id)
+
+
+def offer_print_upscale(product_id: int, upscale: bool | None) -> int:
+    """Before the buyer's files are built: offer to upscale small pages to print size, priced first."""
+    import sys
+
+    from .generate import print_upscale
+    from .generate.raywake import RaywakeClient, require_key
+
+    pages = print_upscale.pages_needing_upscale(product_id)
+    if not pages or upscale is False:
+        return 0
+    require_key()
+    client = RaywakeClient()
+    if upscale is None:
+        if not sys.stdin.isatty():
+            return 0  # unattended runs never spend without --upscale
+        cost = print_upscale.estimate_usd(client, pages)
+        console.print(f"{len(pages)} page(s) print sharp only up to about 5x7 in. Upscaling them 2x makes "
+                      "them sharp on A4 and US Letter at 300 DPI; the text is not redrawn.")
+        if not click.confirm(f"Upscale {len(pages)} page(s) for about ${cost:.2f} with Raywake?", default=False):
+            return 0
+    done = print_upscale.upscale(client, pages, say=console.print)
+    console.print(f"[green]Upscaled {done} page(s) to print size.[/] Originals kept as *.orig.jpg.")
+    return done
 
 
 @cli.command(name="product-report")

@@ -185,6 +185,14 @@ class RaywakeClient:
                 time.sleep(3 * (attempt + 1))
         raise RaywakeError(f"generation failed after {retries} attempts: {last[:300]}")
 
+    def quote(self, model: str, inp: dict) -> dict:
+        """A free price check: {"quote_id", "credits", ...}; credits are cents."""
+        return self._request("POST", "/v1/quotes", body={"model": model, "input": inp})
+
+    def run(self, model: str, inp: dict, timeout: int = 300) -> bytes:
+        """Quote, generate and download one output of any catalog model (same safety as generate)."""
+        return self._run(model, inp, timeout)
+
     def _run(self, model: str, inp: dict, timeout: int) -> bytes:
         quote = self._request("POST", "/v1/quotes", body={"model": model, "input": inp})
         key = str(uuid.uuid4())  # one key per intended image; reused on every retry below

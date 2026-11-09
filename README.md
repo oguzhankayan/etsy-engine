@@ -61,8 +61,10 @@ etsy-engine demo "teacher appreciation week"
   model as references, so the photos show exactly what the buyer downloads. Contents
   grids are pixel-exact. Page counts are never invented. IP checks run on both the
   idea and the generated pixels.
-- **Print-ready output.** 1536×2048 pages, 300-DPI JPEGs, a single `bundle.pdf` and
-  an `individual-pages.zip`, which fit inside Etsy's 5-file limit.
+- **Print-ready output.** Pages are generated at 1536×2048. Before a listing is drafted,
+  `publish` offers to upscale them 2x (3072×4096) so they print sharp on A4 and US Letter
+  at 300 DPI. The upscale keeps the text exactly as it was, costs about $0.07 a page and
+  is only run when you say yes. Buyer files fit inside Etsy's 5-file, 20 MB limits.
 - **Learns.** `metrics` + `learn` correlate what sold with how it was scored and
   re-tune the weights. Proven and seasonal listings are protected from pruning and
   kept renewed.
@@ -134,7 +136,7 @@ Drafts only, by design. Open each draft, tick Etsy's **"With an AI generator"** 
 | `run [--full]` | the discovery funnel, optionally through SEO |
 | `collect` · `score` · `validate` · `architect` | discovery stages |
 | `generate` · `mockups` · `seo` | production stages (queue-wide; check `report` first) |
-| `publish --product-id N` | Etsy draft |
+| `publish --product-id N [--upscale/--no-upscale]` | Etsy draft; asks whether to upscale pages to print size first |
 | `produce -n N` | full pipeline for N products, alternating lanes |
 | `regen-item --item-id N` | re-roll one page without touching the rest |
 | `metrics` · `learn` · `rank-track` · `optimize` · `renew` | after listings are live |

@@ -274,6 +274,13 @@ def _build_print_files(product_id: int):
         suffix = f"-{i}" if len(imgs) > 1 else ""
         png_path = out_dir / f"wall-art{suffix}.png"
         im.save(png_path, "PNG", dpi=(300, 300))
+        if png_path.stat().st_size / 1e6 > _MAX_FILE_MB:
+            # A print-size (upscaled) artwork can pass Etsy's 20 MB file cap as PNG: ship a high-quality JPEG.
+            png_path.unlink()
+            jpg_path = out_dir / f"wall-art{suffix}.jpg"
+            im.save(jpg_path, "JPEG", quality=92, dpi=(300, 300))
+            out.append((jpg_path, "image/jpeg"))
+            continue
         out.append((png_path, "image/png"))
     return out
 

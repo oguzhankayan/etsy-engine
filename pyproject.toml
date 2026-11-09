@@ -1,6 +1,6 @@
 [project]
 name = "etsy-engine"
-version = "0.1.0"
+version = "0.2.0"
 readme = "README.md"
 license = {text = "MIT"}
 description = "Trend-driven Etsy digital product engine: find demand, design printables, make mockups, write SEO, publish drafts. Images by Raywake."

@@ -39,13 +39,13 @@ class Settings(BaseSettings):
     anthropic_model: str = "claude-sonnet-5"
     anthropic_vision_model: str = "claude-sonnet-5"
 
-    # Image generation — Raywake (https://raywake.com). Create a key under API keys in
+    # Image generation — Raywake (https://raywake.si). Create a key under API keys in
     # the studio with the `generate` and `jobs:read` scopes. See generate/raywake.py.
     raywake_api_key: str = ""
     raywake_base_url: str = "https://api.raywake.com"
     raywake_model: str = "openai/gpt-image-2.6/sunburst/text-to-image"
     raywake_edit_model: str = "openai/gpt-image-2.6/sunburst/edit"   # reference-faithful mockups
-    raywake_quality: str = "high"   # low | medium | high | xhigh | max (higher = more credits)
+    raywake_quality: str = "high"   # low | medium | high | xhigh | max (higher = costs more)
 
     # Your storefront identity — printed in buyer-facing delivery PDFs and shop copy.
     shop_name: str = "Your Shop"

@@ -158,7 +158,7 @@ def demo(term: str, max_pages: int, variations: int) -> None:
     r = pipeline.demo(term, max_pages=max_pages, variations=variations)
     console.print(f"[green]Product #{r['product_id']}:[/] {r['title']}")
     console.print(f"Files: {r['dir']}")
-    console.print(f"Images: {r['images']} made with Raywake for {r['credits']} credits "
+    console.print(f"Images: {r['images']} made with Raywake for ${r['credits'] / 100:.2f} "
                   f"(balance: `etsy-engine credits`)")
     console.print("To sell it: connect Etsy (docs/SETUP.md) and run "
                   f"`etsy-engine publish --product-id {r['product_id']}`")
@@ -188,15 +188,42 @@ def logout() -> None:
     console.print(f"To revoke it everywhere: {link('api-keys', 'logout')}", soft_wrap=True)
 
 
+def _usd(wallet: dict, name: str):
+    """`<name>_usd` (decimal string) from GET /v1/wallet, else the legacy integer-cents field."""
+    from decimal import Decimal, InvalidOperation
+    try:
+        if wallet.get(f"{name}_usd") is not None:
+            return Decimal(str(wallet[f"{name}_usd"]))
+        for key in (f"{name}_credits", name):
+            if isinstance(wallet.get(key), (int, float)):
+                return Decimal(str(wallet[key])) / 100
+    except InvalidOperation:
+        pass
+    return None
+
+
+def _balance_line(wallet: dict) -> str:
+    """One readable line for the Raywake wallet, in US dollars."""
+    available, reserved, debt = (_usd(wallet, n) for n in ("available", "reserved", "debt"))
+    if available is None:
+        return f"Raywake balance: {wallet}"
+    line = f"Raywake balance: ${available:.2f} available"
+    if reserved:
+        line += f", ${reserved:.2f} reserved for running jobs"
+    if debt:
+        line += f", ${debt:.2f} owed"
+    return line
+
+
 @cli.command()
 def credits() -> None:
-    """Show the Raywake credit balance + local image spend ledger."""
+    """Show the Raywake balance in US dollars + local image spend ledger."""
     from .generate.raywake import RaywakeClient, link, require_key, total_spend
 
     require_key()
-    console.print("Raywake wallet:", RaywakeClient().credits())
+    console.print(_balance_line(RaywakeClient().credits()))
     ws = total_spend()
-    console.print(f"Spent locally: {ws['credits']} credits over {ws['images']} image(s) "
+    console.print(f"Spent locally: ${ws['credits'] / 100:.2f} over {ws['images']} image(s) "
                   f"(ledger: data/raywake_spend.jsonl)")
     console.print(f"Top up / usage: {link('pricing', 'credits-cmd')}", soft_wrap=True)
 

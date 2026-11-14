@@ -3,15 +3,15 @@
 Every image in the pipeline (printable pages, banners, Canva posters, listing
 mockups) goes through `RaywakeClient.generate(...)`, which returns raw image bytes.
 
-API contract (https://raywake.com/docs):
+API contract (https://raywake.si/docs):
   auth:  Authorization: Bearer RAYWAKE_API_KEY
-  1. POST /v1/quotes   {"model", "input"}                      -> {"quote_id", "credits", ...}
+  1. POST /v1/quotes   {"model", "input"}                      -> {"quote_id", "price_usd", "credits", ...}
   2. POST /v1/generate {"model", "quote_id", "input"}  + Idempotency-Key header
      (?wait=true blocks until a terminal state, up to the server deadline)
   3. GET  /v1/jobs/{job_id}                                     -> {"status", "outputs": [{"url"}]}
 
 Billing rules this client respects:
-  - Starting a generation reserves credits; failure releases them.
+  - Starting a generation reserves funds from the USD balance; failure releases them.
   - A timeout is NOT proof of failure: we retry with the SAME Idempotency-Key, which
     returns the existing job instead of starting (and paying for) a new one.
   - `needs_review` / `needs_reconciliation` / `submission_unknown` are never treated as
@@ -33,12 +33,12 @@ from pathlib import Path
 
 from ..config import DATA_DIR, settings
 
-SPEND_LOG = DATA_DIR / "raywake_spend.jsonl"  # append-only per-image credit ledger
+SPEND_LOG = DATA_DIR / "raywake_spend.jsonl"  # append-only per-image spend ledger (US cents)
 
 
 def link(path: str = "", content: str = "cli") -> str:
-    """A raywake.com link tagged so Raywake can tell which etsy-engine touchpoint sent you."""
-    return (f"https://raywake.com/{path.lstrip('/')}?utm_source=github"
+    """A raywake.si link tagged so Raywake can tell which etsy-engine touchpoint sent you."""
+    return (f"https://raywake.si/{path.lstrip('/')}?utm_source=github"
             f"&utm_medium=etsy-engine&utm_campaign=oss&utm_content={content}")
 
 
@@ -70,7 +70,7 @@ DEFAULT_SIZE = "1536x2048"
 
 ERRORS = {
     400: "Bad request (invalid input for this model)", 401: "Unauthorized (bad/revoked API key)",
-    402: f"Out of Raywake credits — top up here: {TOPUP_URL}",
+    402: f"Raywake balance too low — top up here: {TOPUP_URL}",
     403: "Forbidden (API key is missing a scope: needs generate + jobs:read)",
     404: "Not found", 409: "Conflict (quote expired/changed input or idempotency clash)",
     413: "Request too large", 429: "Rate limited",
@@ -125,7 +125,7 @@ class RaywakeClient:
         if not self.api_key:
             require_key()
         h = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json",
-             "User-Agent": "etsy-engine (+https://raywake.com)"}
+             "User-Agent": "etsy-engine (+https://raywake.si)"}
         if idempotency_key:
             h["Idempotency-Key"] = idempotency_key
         return h
@@ -178,8 +178,8 @@ class RaywakeClient:
             except RaywakeJobUnknown:
                 raise
             except RaywakeError as e:
-                # Only a clean rejection or a FAILED job (credits released) is safe to retry,
-                # and only if it isn't a hard failure (auth, credits, bad input).
+                # Only a clean rejection or a FAILED job (funds released) is safe to retry,
+                # and only if it isn't a hard failure (auth, balance, bad input).
                 last = str(e)
                 if any(f" {c} " in last for c in ("400", "401", "402", "403", "413")):
                     raise
@@ -187,7 +187,7 @@ class RaywakeClient:
         raise RaywakeError(f"generation failed after {retries} attempts: {last[:300]}")
 
     def quote(self, model: str, inp: dict) -> dict:
-        """A free price check: {"quote_id", "credits", ...}; credits are cents."""
+        """A free price check: {"quote_id", "price_usd", "credits", ...}; legacy `credits` is US cents."""
         return self._request("POST", "/v1/quotes", body={"model": model, "input": inp})
 
     def upload(self, path, content_type: str = "image/jpeg") -> str:
@@ -244,9 +244,9 @@ class RaywakeClient:
             if status in FAILED:
                 raise RaywakeError(f"job {job.get('job_id')} {status}: {job.get('error') or ''}")
             if status in HELD:
-                # Credits stay reserved until Raywake settles it; resubmitting could double-pay.
+                # Funds stay reserved until Raywake settles it; resubmitting could double-pay.
                 raise RaywakeJobUnknown(f"job {job.get('job_id')} held ({status}) — check it at "
-                                        "https://raywake.com before retrying")
+                                        "https://raywake.si before retrying")
             if time.time() > deadline:
                 raise RaywakeJobUnknown(f"timed out waiting for job {job.get('job_id')} ({status})")
             time.sleep(4)
@@ -268,7 +268,7 @@ class RaywakeClient:
         raise RaywakeError(f"download failed: {last}")
 
     def credits(self) -> dict:
-        """Current Raywake wallet (credit balance)."""
+        """Current Raywake wallet (USD balance: available_usd, reserved_usd, debt_usd)."""
         return self._request("GET", "/v1/wallet")
 
 

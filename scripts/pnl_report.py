@@ -9,7 +9,7 @@ Usage:
     .venv/bin/python scripts/pnl_report.py                # print the report
     .venv/bin/python scripts/pnl_report.py --ads 20       # assume $20/mo onsite ads
     .venv/bin/python scripts/pnl_report.py --no-live      # skip live Etsy price pulls
-    .venv/bin/python scripts/pnl_report.py --usd-per-credit 0.01   # price Raywake credits
+    .venv/bin/python scripts/pnl_report.py --usd-per-credit 0.01   # Raywake ledger is in US cents
     .venv/bin/python scripts/pnl_report.py --write        # append a dated section to
                                                           # docs/profitability-report.md
 
@@ -73,7 +73,7 @@ def main() -> None:
     ap.add_argument("--no-live", action="store_true",
                     help="Do not pull live Etsy prices for rows missing a price")
     ap.add_argument("--usd-per-credit", type=float, default=0.0,
-                    help="USD value of one Raywake credit (for the production-cost line)")
+                    help="USD per Raywake ledger unit; the ledger records US cents, so 0.01 (for the production-cost line)")
     ap.add_argument("--write", action="store_true",
                     help="Append a dated section to docs/profitability-report.md")
     args = ap.parse_args()
@@ -133,8 +133,8 @@ def main() -> None:
                 f"{anthropic_spend['calls']} calls, "
                 f"{anthropic_spend['input_tokens']}in/{anthropic_spend['output_tokens']}out tok")
     led.add_row("Raywake (images)", f"${image_spend['total_usd']:.4f}",
-                f"{image_spend['images']} images, {image_spend['credits']} credits"
-                + ("" if args.usd_per_credit else " (pass --usd-per-credit to price them)"))
+                f"{image_spend['images']} images, ${image_spend['credits'] / 100:.2f} at Raywake"
+                + ("" if args.usd_per_credit else " (pass --usd-per-credit 0.01 to count it here)"))
     console.print(led)
 
     # ---- P&L ----
@@ -194,7 +194,7 @@ def _append_report(day, listing_count, avg_price, views, favs, sales, conv, reve
         f"- Realized revenue ${revenue:.2f}. NET to date ex ads/offsite ${net:+.2f}; "
         f"worst-case (offsite 15%) ${net_worst:+.2f}.\n"
         f"- Production ledgers: Anthropic ${anthropic_spend['total_usd']:.4f} "
-        f"({anthropic_spend['calls']} calls), Raywake {image_spend['credits']} credits "
+        f"({anthropic_spend['calls']} calls), Raywake ${image_spend['credits'] / 100:.2f} "
         f"({image_spend['images']} images).\n"
     )
     with p.open("a") as fh:

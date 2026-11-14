@@ -160,11 +160,26 @@ def test_missing_key_points_to_raywake_with_utm(monkeypatch):
     monkeypatch.setattr(raywake.settings, "raywake_api_key", "")
     with pytest.raises(raywake.MissingKeyError) as e:
         raywake.require_key()
-    assert "raywake.com/api-keys?utm_source=github" in str(e.value)
+    assert "https://raywake.si/api-keys?utm_source=github" in str(e.value)
 
 
 def test_out_of_credits_links_to_topup(client, monkeypatch):
     calls = []
     _wire(monkeypatch, [FakeResp(status=402, payload={})], calls)
-    with pytest.raises(RaywakeError, match="utm_content=out-of-credits"):
+    with pytest.raises(RaywakeError, match="utm_content=out-of-credits") as e:
         client.generate("p")
+    assert "Raywake balance too low" in str(e.value)
+    assert "https://raywake.si/pricing?utm_source=github" in str(e.value)
+
+
+def test_site_links_and_user_agent_use_raywake_si(client):
+    assert raywake.link("api-keys", "x").startswith("https://raywake.si/api-keys?utm_source=github")
+    assert client._headers()["User-Agent"] == "etsy-engine (+https://raywake.si)"
+
+
+def test_balance_line_is_in_us_dollars():
+    from etsy_engine.__main__ import _balance_line
+    assert _balance_line({"available_usd": "12.5", "reserved_usd": "0.40", "debt_usd": "0"}) == \
+        "Raywake balance: $12.50 available, $0.40 reserved for running jobs"
+    assert _balance_line({"available_credits": 1234}) == "Raywake balance: $12.34 available"
+    assert _balance_line({}) == "Raywake balance: {}"

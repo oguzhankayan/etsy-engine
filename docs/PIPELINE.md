@@ -178,7 +178,7 @@ Etsy's Open API does not expose shop-banner uploads; set the banner in Shop Mana
 
 ### Safe staged workflow
 
-Use this when reviewing opportunities before spending image credits:
+Use this when reviewing opportunities before spending your balance on images:
 
 ```bash
 .venv/bin/python scripts/sync_etsy_history.py

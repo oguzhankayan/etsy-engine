@@ -15,7 +15,7 @@ Python 3.11+.
 
 | Key | Needed for | Where |
 |-----|-----------|-------|
-| `RAYWAKE_API_KEY` | every image (pages, mockups, banners) | [raywake.com/api-keys](https://raywake.com/api-keys?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=setup). Scopes: `generate`, `jobs:read`. |
+| `RAYWAKE_API_KEY` | every image (pages, mockups, banners) | [raywake.si/api-keys](https://raywake.si/api-keys?utm_source=github&utm_medium=etsy-engine&utm_campaign=oss&utm_content=setup). Scopes: `generate`, `jobs:read`. |
 | `ANTHROPIC_API_KEY` | scoring, product design, page QC, SEO | [console.anthropic.com](https://console.anthropic.com) |
 | `ETSY_API_KEY` + `ETSY_SHARED_SECRET` | real market validation + publishing | [etsy.com/developers](https://www.etsy.com/developers/your-apps) |
 | `REDDIT_*`, `OPENROUTER_API_KEY`, `CONTEXT_DEV_API_KEY` | optional trend sources / enrichment | — |
@@ -29,7 +29,7 @@ when you want demand validated against real listings and drafts created in your 
 
 `src/etsy_engine/generate/raywake.py` is the only image client. Every call:
 
-1. **quotes** the exact model + input (`POST /v1/quotes`) — you see the credit cost
+1. **quotes** the exact model + input (`POST /v1/quotes`) — you see the price in US dollars
    before anything runs;
 2. **starts** the job with a unique `Idempotency-Key` (`POST /v1/generate?wait=true`);
 3. **polls** the job (`GET /v1/jobs/{id}`) and downloads the output.

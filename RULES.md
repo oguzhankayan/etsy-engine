@@ -122,7 +122,7 @@ plays are scarce/IP-constrained on any given day — that's expected, not a bug.
 - **Check your Raywake balance before big runs** (`etsy-engine credits`). Every image
   is quoted before it starts, and **mockups dominate** (large reference-faithful edits
   cost more than a page). Prefer `--variations 1` when the balance is low, and never
-  start a bundle you can't finish — a mid-run credit-out leaves a half-generated,
+  start a bundle you can't finish — running out of balance mid-run leaves a half-generated,
   unpublishable product.
 
 ## G. Performance & robustness (already built in — keep it)

@@ -71,7 +71,7 @@ The 5 `design.py` aesthetics are now a **floor/fallback**, not the default look.
 same engine, three totally different products: a minimal sage budget planner, a bright cartoon dino
 birthday invite, and a pastel spooky-cute Halloween invitation.
 
-Cost: ~one vision + one text call per new product (research cached). This is the anti-"waste credits
+Cost: ~one vision + one text call per new product (research cached). This is the anti-"waste money
 on a generic product" lever — spend a cent on design intelligence so the pages fit the market.
 
 ## Magic-Layers design rules (baked into `poster.build_prompt`)
